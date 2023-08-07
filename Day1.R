@@ -5,14 +5,15 @@ object1 <- c(1,2,3,4,5,6,7,8,9,10)
 mean(object1)
 
 object2 <- c(1:10)
+
 mean(object2)
 
 median(object2)
 
 summary(object1)
 
-# install packages 
-#install.packages('tidyverse')
+## install packages 
+#install.packages('tidyverse') # already installed
 
 # loading the package 
 library(tidyverse)
