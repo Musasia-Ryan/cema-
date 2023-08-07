@@ -210,6 +210,87 @@ ideal <- read.csv("https://raw.githubusercontent.com/ThumbiMwangi/R_sources/mast
 # summarize 
 table(ideal$ReasonsLoss1)
 
+library(ggplot2)
+
+#plot
+ggplot(data = ideal, aes(x= ReasonsLoss1)) +
+  geom_bar() + # specify type of graph
+  theme_bw() +# change background theme 
+  labs(x = "Calf status at the end of study", 
+       y = 'Number of calves', 
+       title = "Graph showing calf status") # add labels 
 
 
+# get frequency (count)
+calves_sublocation <- ideal %>% 
+  select (sublocation) %>% 
+  group_by(sublocation) %>% 
+  count()
 
+# OR Alternatively 
+
+#get frequency (summarise)
+calves_sublocation <- ideal %>% 
+  select (sublocation) %>% 
+  group_by(sublocation) %>% 
+  summarise (freq=n())
+
+#plot frequency 
+ggplot(calves_sublocation, aes(x = reorder(sublocation,freq, desc), y = freq)) +
+  geom_col() +
+  theme_bw() +
+  labs(y= "Frequency", x= "Sublocation")+ 
+  coord_flip() #flip your graph 
+ 
+
+#get exact number of calves per sublocation (by removing duplicates)
+calves_sublocation <- ideal %>% 
+  select(CalfID, sublocation) %>% 
+  distinct() %>% 
+  group_by(sublocation) %>% 
+  summarise(freq=n())
+  ungroup()
+
+#plot
+ggplot(calves_sublocation, aes(x = reorder(sublocation,freq), y = freq)) +
+  geom_col() +
+  theme_bw() +
+  labs(x = "Sublocation", y = "Frequency") +
+  coord_flip()
+
+#summarize by sublocation and gender
+calves_gender <- ideal %>% 
+  select(sublocation, CalfSex) %>% 
+  mutate(CalfSex = recode(CalfSex, "1" = "Male", "2"= "Female"))%>%
+  group_by(sublocation, CalfSex) %>% 
+  summarise(freq=n())%>% 
+  ungroup()
+
+#visualise the 
+ggplot(calves_gender, aes(x = sublocation, y = freq, fill = CalfSex)) + #set the color of the graph 
+  geom_col() +
+  theme_bw() +
+  #customize colours 
+  #scale_fill_brewer(palette = "Set1") +
+  scale_fill_manual(values = c("#a8ddb5", "#43a2ca")) + # you can use scale_fill_manual whereby you manually set the colours yourself 
+  labs(x = "Sublocation", y = "Frequency") +
+  coord_flip()
+
+## summmarise by sublocation and gender & get the proportions 
+calves_gender <- ideal %>% 
+  select(sublocation, CalfSex) %>% 
+  mutate(CalfSex = recode(CalfSex, "1" = "Male", "2"= "Female")) %>% 
+  group_by(sublocation, CalfSex) %>% 
+  summarise(freq=n())%>%
+  ungroup() %>% 
+  group_by(sublocation) %>% 
+  mutate(proportion = freq/sum(freq)*100)
+
+##visualise 
+ggplot(calves_gender, aes(x = sublocation, y = proportion, fill = CalfSex)) +
+  geom_col() +
+  theme_bw() +
+  scale_fill_brewer(palette = "Set1") + 
+  labs(x = "Sublocation", y = "Frequency") +
+  coord_flip()
+  
