@@ -193,25 +193,23 @@ dogdemography1 <- dogdemography %>%
           puppiesOwned = Puppies,
           dogDiedPastMonth = DogDied,
           numDogsDiedPastMonth = NumDd,
-          dogBitesPastMonth = DogBite)
-
-# changing the the interview Date data type from chr to date 
-dogdemography1a <-dogdemography1 %>% 
-  mutate(interviewDate = as.Date(interviewDate, format = "%m/%d/%y"))
-
-#recode the categorical variables 
-dogdemography1b <- dogdemography1a %>% 
-  mutate(OwnDogs = recode(OwnDogs, "0" = "No", "1" = "Yes"))
-
-#get average number of household members per village
-dogdemography1c <- dogdemography1b %>% 
+          dogBitesPastMonth = DogBite) %>% 
+  mutate(interviewDate = as.Date(interviewDate, format = "%m/%d/%y")) %>%  
+  mutate(dogDiedPastMonth = as.logical(dogDiedPastMonth)) %>% 
+  mutate(dogBitesPastMonth = ifelse(dogBitesPastMonth == "0", "No", ifelse(dogBitesPastMonth == "1", "Yes", NA)))%>% 
   group_by(VillageID) %>% 
-  mutate(avg_household_members_per_village = mean(householdMembers))
-
-#get number of dogs per village 
-dogdemography1d <- dogdemography1c %>% 
+  mutate(avg_household_members_per_village = round(mean(householdMembers))) %>% 
   group_by(VillageID) %>% 
-  mutate(avg_dogs_per_village = mean(numDogsOwned))
+  mutate(avg_dogs_per_village = round(mean(numDogsOwned)))
+  
+
+
+## load more data 
+ideal <- read.csv("https://raw.githubusercontent.com/ThumbiMwangi/R_sources/master/ideal3a.csv")
+
+# summarize 
+table(ideal$ReasonsLoss1)
+
 
 
 
